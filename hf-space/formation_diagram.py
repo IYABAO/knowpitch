@@ -229,7 +229,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
     if team_label:
         title1 = f"{team_label} | {title1}"
     # 第一行：主题
-    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-120}" text-anchor="middle" '
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-80}" text-anchor="middle" '
                f'font-size="40" font-weight="bold" fill="{TEXT_COLOR}">{esc(title1)}</text>')
     # 第二行：阵型
     svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-80}" text-anchor="middle" '
@@ -314,7 +314,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
                   f"「{p.get('name')}」已放入替补席", file=sys.stderr)
     bench_all = leftovers + bench
     if bench_all:
-        by = y1 + 90
+        by = y1 + 120
         # 替补席标题
         svg.append(f'<text x="{x0+5}" y="{by}" font-size="13" font-weight="bold" '
                    f'fill="{TEXT_COLOR}">替补席（{len(bench_all)}人）</text>')
@@ -351,7 +351,7 @@ def main():
     b_team = team.get("b_team")
 
     # 计算画布高度（给替补席留空间）
-    base_height = 1300
+    base_height = 1450
     bench_extra = 120  # 替补席额外高度
 
     svg = []
