@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 formation_diagram.py — 把"知识阵容"渲染成足球场 SVG 阵型图
 
@@ -150,23 +150,40 @@ def pitch_lines(box, clip_id):
     return L
 
 
-def wrap_name(name, max_chars=6, max_lines=2):
-    """把名字按最多 max_chars 个字符换行，超出 max_lines 用省略号。"""
+def wrap_name(name, max_chars=14, max_lines=3):
+    """把名字换行：英文按单词，中文按字符；超出 max_lines 用省略号。"""
     name = str(name).strip()
     if not name:
         return [""]
-    
-    lines = []
-    cur = ""
-    for ch in name:
-        if len(cur) >= max_chars:
+
+    # 判断是否主要是英文（含空格）
+    has_space = ' ' in name
+    if has_space:
+        # 英文：按单词换行
+        words = name.split(' ')
+        lines = []
+        cur = ""
+        for w in words:
+            if cur and len(cur) + 1 + len(w) > max_chars:
+                lines.append(cur)
+                cur = w
+            else:
+                cur = (cur + " " + w).strip()
+        if cur:
             lines.append(cur)
-            cur = ch
-        else:
-            cur += ch
-    if cur:
-        lines.append(cur)
-    
+    else:
+        # 中文：按字符换行
+        lines = []
+        cur = ""
+        for ch in name:
+            if len(cur) >= max_chars:
+                lines.append(cur)
+                cur = ch
+            else:
+                cur += ch
+        if cur:
+            lines.append(cur)
+
     # 超过最大行数，最后一行加省略号
     if len(lines) > max_lines:
         lines = lines[:max_lines]
@@ -175,7 +192,7 @@ def wrap_name(name, max_chars=6, max_lines=2):
             lines[-1] = last[:max_chars-1] + "…"
         else:
             lines[-1] = last + "…"
-    
+
     return lines
 
 
@@ -261,12 +278,12 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
             svg.append(f'<text x="{cx:.1f}" y="{cy+9:.1f}" text-anchor="middle" font-size="8" '
                        f'fill="#fff">{esc(gname)}</text>')
             # 球员名字（在圆圈下方）
-            lines = wrap_name(p.get("name", ""), max_chars=6, max_lines=2)
+            lines = wrap_name(p.get("name", ""), max_chars=14, max_lines=3)
             ty = cy + r + 12
             for ln in lines:
                 svg.append(f'<text x="{cx:.1f}" y="{ty:.1f}" text-anchor="middle" font-size="10" '
                            f'font-weight="bold" fill="{TEXT_COLOR}">{esc(ln)}</text>')
-                ty += 12
+                ty += 13
     # === 空位（可继续深挖） ===
     for i, (code, px, py) in enumerate(slots):
         if i in used_slots:
@@ -304,7 +321,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
                        f'stroke="#fff" stroke-width="2"/>')
             svg.append(f'<text x="{bx}" y="{by+3}" text-anchor="middle" font-size="7" '
                        f'fill="#fff">SUB</text>')
-            lines = wrap_name(p.get("name", ""), max_chars=8, max_lines=2)
+            lines = wrap_name(p.get("name", ""), max_chars=24, max_lines=2)
             ty = by + 22
             for ln in lines:
                 svg.append(f'<text x="{bx}" y="{ty}" text-anchor="middle" font-size="9" '
