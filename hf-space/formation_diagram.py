@@ -229,15 +229,15 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
     if team_label:
         title1 = f"{team_label} | {title1}"
     # 第一行：主题
-    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-115}" text-anchor="middle" '
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-145}" text-anchor="middle" '
                f'font-size="40" font-weight="bold" fill="{TEXT_COLOR}">{esc(title1)}</text>')
     # 第二行：阵型
-    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-115}" text-anchor="middle" '
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-145}" text-anchor="middle" '
                f'font-size="28" font-weight="bold" fill="#666">{esc(title2)}</text>')
 
     # === 主教练（标题下方，左侧） ===
     if coach:
-        cx, cy = x0 + 20, y0 - 60
+        cx, cy = x0 + 20, y0 - 90
         svg.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="20" fill="{COACH_COLOR}"/>')
         svg.append(f'<text x="{cx:.0f}" y="{cy+4:.0f}" text-anchor="middle" '
                    f'font-size="12" font-weight="bold" fill="#fff">HC</text>')
@@ -362,8 +362,8 @@ def main():
     svg.append(f'<rect width="1600" height="{base_height + bench_extra}" fill="#F4F7F2"/>')
 
     if b_team:
-        main_box = (50, 220, 750, 1100)
-        b_box = (850, 220, 1550, 1100)
+        main_box = (50, 260, 750, 1100)
+        b_box = (850, 260, 1550, 1100)
         draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
                   team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
         bt = b_team.get("topic", topic + "·进阶")
@@ -372,7 +372,7 @@ def main():
                   b_team.get("bench", []), b_team.get("flow"), bt,
                   team_label="B 队", b_team=True, clip_id="pitch_b", flip=True)
     else:
-        main_box = (50, 220, 1550, 1100)
+        main_box = (50, 260, 1550, 1100)
         draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
                   team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
 
