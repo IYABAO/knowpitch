@@ -229,10 +229,10 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
     if team_label:
         title1 = f"{team_label} | {title1}"
     # 第一行：主题
-    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-90}" text-anchor="middle" '
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-120}" text-anchor="middle" '
                f'font-size="40" font-weight="bold" fill="{TEXT_COLOR}">{esc(title1)}</text>')
     # 第二行：阵型
-    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-50}" text-anchor="middle" '
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-80}" text-anchor="middle" '
                f'font-size="28" font-weight="bold" fill="#666">{esc(title2)}</text>')
 
     # === 主教练（标题下方，左侧） ===
@@ -314,7 +314,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
                   f"「{p.get('name')}」已放入替补席", file=sys.stderr)
     bench_all = leftovers + bench
     if bench_all:
-        by = y1 + 50
+        by = y1 + 90
         # 替补席标题
         svg.append(f'<text x="{x0+5}" y="{by}" font-size="13" font-weight="bold" '
                    f'fill="{TEXT_COLOR}">替补席（{len(bench_all)}人）</text>')
