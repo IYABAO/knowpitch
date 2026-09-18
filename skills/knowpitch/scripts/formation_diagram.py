@@ -227,7 +227,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
     title = f"{esc(topic_label)}   {esc(formation)}"
     if team_label:
         title = f"{esc(team_label)} | {title}"
-    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-80}" text-anchor="middle" '
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-120}" text-anchor="middle" '
                f'font-size="64" font-weight="bold" fill="{TEXT_COLOR}">{title}</text>')
 
     # === 主教练（标题下方，左侧） ===
@@ -346,7 +346,7 @@ def main():
     b_team = team.get("b_team")
 
     # 计算画布高度（给替补席留空间）
-    base_height = 1500
+    base_height = 1700
     bench_extra = 120  # 替补席额外高度
 
     svg = []
@@ -357,8 +357,8 @@ def main():
     svg.append(f'<rect width="1800" height="{base_height + bench_extra}" fill="#F4F7F2"/>')
 
     if b_team:
-        main_box = (60, 140, 860, 1200)
-        b_box = (940, 140, 1740, 1200)
+        main_box = (60, 200, 860, 1350)
+        b_box = (940, 200, 1740, 1350)
         draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
                   team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
         bt = b_team.get("topic", topic + "·进阶")
@@ -367,7 +367,7 @@ def main():
                   b_team.get("bench", []), b_team.get("flow"), bt,
                   team_label="B 队", b_team=True, clip_id="pitch_b", flip=True)
     else:
-        main_box = (60, 140, 1740, 1200)
+        main_box = (60, 200, 1740, 1350)
         draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
                   team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
 

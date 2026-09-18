@@ -1,2 +1,4 @@
 ﻿gradio>=4.0.0
 spaces>=0.0.0
+cairosvg>=2.7.0
+Pillow>=10.0.0
