@@ -87,7 +87,7 @@ EXAMPLES = load_examples()
 
 
 def generate_diagram(team_data):
-    """生成阵型图 SVG，返回文件路径"""
+    """生成阵型图，返回嵌入 SVG 的 HTML 字符串（width:100% 填满容器）"""
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
     from formation_diagram import main as diagram_main
@@ -107,7 +107,16 @@ def generate_diagram(team_data):
     finally:
         sys.argv = old_argv
 
-    return svg_path
+    # 读取 SVG 内容，包裹在 div 中填满容器
+    with open(svg_path, "r", encoding="utf-8") as f:
+        svg_content = f.read()
+
+    # 移除 SVG 的 width/height 属性，让它自适应容器
+    import re
+    svg_content = re.sub(r'width="\d+"', 'width="100%"', svg_content, count=1)
+    svg_content = re.sub(r'height="\d+"', '', svg_content, count=1)
+
+    return f'<div style="width:100%; overflow-x:auto;">{svg_content}</div>'
 
 
 def generate_custom_team(topic, formation="4-3-3"):
@@ -319,7 +328,7 @@ with gr.Blocks(title="KnowPitch 球知 - 用足球阵型学知识", theme=gr.the
 
         with gr.Column(scale=2):
             status = gr.Markdown("选择主题后点击生成")
-            svg_output = gr.Image(label="阵型图 Formation Diagram", type="filepath")
+            svg_output = gr.HTML(label="阵型图 Formation Diagram")
 
             with gr.Tabs():
                 with gr.Tab("👥 球员卡 Player Cards"):
