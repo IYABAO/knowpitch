@@ -6,28 +6,12 @@ KnowPitch (球知) - Hugging Face Space Demo
 
 import json
 import os
-import subprocess
 import tempfile
 from pathlib import Path
 
 import gradio as gr
 
-# 安装中文字体（首次启动时执行）
-_FONT_INSTALLED = False
-def _ensure_chinese_font():
-    global _FONT_INSTALLED
-    if _FONT_INSTALLED:
-        return
-    try:
-        subprocess.run(["apt-get", "update"], capture_output=True, timeout=60)
-        subprocess.run(["apt-get", "install", "-y", "fonts-noto-cjk"], capture_output=True, timeout=120)
-        _FONT_INSTALLED = True
-        print("✅ 中文字体安装完成")
-    except Exception as e:
-        print(f"⚠️ 中文字体安装失败: {e}")
-        _FONT_INSTALLED = True  # 避免重复尝试
 
-_ensure_chinese_font()
 
 
 
@@ -105,7 +89,7 @@ EXAMPLES = load_examples()
 
 
 def generate_diagram(team_data):
-    """生成阵型图，返回高分辨率 PNG 文件路径"""
+    """生成阵型图 SVG，返回文件路径"""
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
     from formation_diagram import main as diagram_main
@@ -116,7 +100,6 @@ def generate_diagram(team_data):
         json_path = f.name
 
     svg_path = json_path.replace(".json", ".svg")
-    png_path = json_path.replace(".json", ".png")
 
     # 调用生成脚本
     old_argv = sys.argv
@@ -126,19 +109,7 @@ def generate_diagram(team_data):
     finally:
         sys.argv = old_argv
 
-    # SVG → 高分辨率 PNG（2x 缩放，确保文字清晰）
-    try:
-        import cairosvg
-        cairosvg.svg2png(
-            url=svg_path,
-            write_to=png_path,
-            output_width=3600,  # 2x 1800px
-            output_height=3240  # 2x 1620px
-        )
-        return png_path
-    except Exception as e:
-        print(f"⚠️ PNG 转换失败，返回 SVG: {e}")
-        return svg_path
+    return svg_path
 
 
 def generate_custom_team(topic, formation="4-3-3"):

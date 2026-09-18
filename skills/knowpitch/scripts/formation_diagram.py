@@ -232,10 +232,10 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
 
     # === 主教练（标题下方，左侧） ===
     if coach:
-        cx, cy = x0 + 20, y0 - 25
-        svg.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="14" fill="{COACH_COLOR}"/>')
+        cx, cy = x0 + 20, y0 - 50
+        svg.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="36" fill="{COACH_COLOR}"/>')
         svg.append(f'<text x="{cx:.0f}" y="{cy+4:.0f}" text-anchor="middle" '
-                   f'font-size="9" font-weight="bold" fill="#fff">HC</text>')
+                   f'font-size="20" font-weight="bold" fill="#fff">HC</text>')
         coach_text = f"主教练·{coach.get('name','')}"
         svg.append(f'<text x="{cx+20:.0f}" y="{cy+4:.0f}" font-size="12" '
                    f'font-weight="bold" fill="{TEXT_COLOR}">{esc(coach_text)}</text>')
@@ -282,7 +282,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
                        f'fill="#fff">{esc(gname)}</text>')
             # 球员名字（在圆圈下方）
             lines = wrap_name(p.get("name", ""), max_chars=14, max_lines=3)
-            ty = cy + r + 20
+            ty = cy + r + 25
             for ln in lines:
                 svg.append(f'<text x="{cx:.1f}" y="{ty:.1f}" text-anchor="middle" font-size="10" '
                            f'font-weight="bold" fill="{TEXT_COLOR}">{esc(ln)}</text>')
@@ -309,28 +309,28 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
                   f"「{p.get('name')}」已放入替补席", file=sys.stderr)
     bench_all = leftovers + bench
     if bench_all:
-        by = y1 + 30
+        by = y1 + 80
         # 替补席标题
         svg.append(f'<text x="{x0+5}" y="{by}" font-size="13" font-weight="bold" '
                    f'fill="{TEXT_COLOR}">替补席（{len(bench_all)}人）</text>')
         # 替补内容（标题下方 20px 开始）
-        by += 22
+        by += 60
         bx = x0 + 15
         for p in bench_all:
             if bx > x1 - 30:
                 bx = x0 + 15
-                by += 48
-            svg.append(f'<circle cx="{bx}" cy="{by}" r="36" fill="{BENCH_COLOR}" '
+                by += 120
+            svg.append(f'<circle cx="{bx}" cy="{by}" r="40" fill="{BENCH_COLOR}" '
                        f'stroke="#fff" stroke-width="2"/>')
             svg.append(f'<text x="{bx}" y="{by+3}" text-anchor="middle" font-size="7" '
                        f'fill="#fff">SUB</text>')
             lines = wrap_name(p.get("name", ""), max_chars=24, max_lines=2)
-            ty = by + 22
+            ty = by + 50
             for ln in lines:
                 svg.append(f'<text x="{bx}" y="{ty}" text-anchor="middle" font-size="9" '
                            f'font-weight="bold" fill="{TEXT_COLOR}">{esc(ln)}</text>')
-                ty += 10
-            bx += 48
+                ty += 42
+            bx += 100
 
 
 def main():
