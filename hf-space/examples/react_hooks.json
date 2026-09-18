@@ -1,0 +1,24 @@
+{
+  "topic": "React Hooks",
+  "formation": "4-3-3",
+  "coach": {"name": "让函数组件拥有状态", "desc": "Hooks让函数组件也能有state、生命周期等能力，不用写class"},
+  "players": [
+    {"pos": "GK", "name": "什么是Hooks", "desc": "React 16.8引入，让函数组件更强大"},
+    {"pos": "CB", "name": "useState", "desc": "在函数组件里用状态"},
+    {"pos": "CB", "name": "useEffect", "desc": "处理副作用（请求、订阅等）"},
+    {"pos": "LB", "name": "函数组件", "desc": "Hooks的载体"},
+    {"pos": "RB", "name": "Class组件", "desc": "Hooks要替代的对象"},
+    {"pos": "CDM", "name": "闭包陷阱", "desc": "useEffect里的旧值问题"},
+    {"pos": "CM", "name": "依赖数组", "desc": "useEffect第二个参数"},
+    {"pos": "CM", "name": "自定义Hooks", "desc": "复用逻辑的最佳方式"},
+    {"pos": "LW", "name": "useContext", "desc": "跨组件共享状态"},
+    {"pos": "CF", "name": "性能优化", "desc": "useMemo、useCallback、useRef"},
+    {"pos": "RW", "name": "useReducer", "desc": "复杂状态管理"}
+  ],
+  "bench": [
+    {"name": "useLayoutEffect", "desc": "同步执行的effect"},
+    {"name": "useImperativeHandle", "desc": "暴露ref方法"},
+    {"name": "Rules of Hooks", "desc": "Hooks使用规则"}
+  ],
+  "flow": ["GK", "CB", "CDM", "CM", "CF"]
+}

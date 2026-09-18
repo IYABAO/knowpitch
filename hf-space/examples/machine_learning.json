@@ -1,0 +1,44 @@
+{
+  "topic": "机器学习 Machine Learning",
+  "formation": "4-2-3-1",
+  "coach": {"name": "从数据找规律", "desc": "机器学习就是让电脑从例子里总结规律，然后预测新情况"},
+  "players": [
+    {"pos": "GK", "name": "什么是学习", "desc": "从数据中找规律，不是硬编码规则"},
+    {"pos": "CB", "name": "特征与标签", "desc": "输入是特征，输出是标签"},
+    {"pos": "CB", "name": "训练集与测试集", "desc": "用训练集学，用测试集考"},
+    {"pos": "LB", "name": "监督学习", "desc": "有标准答案的学习"},
+    {"pos": "RB", "name": "无监督学习", "desc": "没有标准答案，自己找结构"},
+    {"pos": "CDM", "name": "梯度下降", "desc": "一步步往最低点走"},
+    {"pos": "CDM", "name": "损失函数", "desc": "衡量预测错得有多离谱"},
+    {"pos": "LAM", "name": "分类问题", "desc": "判断是猫还是狗"},
+    {"pos": "AMD", "name": "三大范式", "desc": "监督/无监督/强化学习"},
+    {"pos": "RAM", "name": "回归问题", "desc": "预测房价、股价等连续值"},
+    {"pos": "CF", "name": "预测", "desc": "用学到的规律预测新数据"}
+  ],
+  "bench": [
+    {"name": "过拟合", "desc": "死记硬背，不会举一反三"},
+    {"name": "正则化", "desc": "防止过拟合的手段"},
+    {"name": "强化学习", "desc": "通过奖励学习行为"}
+  ],
+  "flow": ["GK", "CB", "CDM", "AMD", "CF"],
+  "b_team": {
+    "formation": "3-4-3",
+    "coach": {"name": "深度学习与应用", "desc": "用神经网络解决复杂问题"},
+    "players": [
+      {"pos": "CB", "name": "神经网络", "desc": "模拟人脑的计算结构"},
+      {"pos": "CB", "name": "CNN", "desc": "卷积神经网络，擅长图像"},
+      {"pos": "CB", "name": "RNN", "desc": "循环神经网络，擅长序列"},
+      {"pos": "LM", "name": "计算机视觉", "desc": "让电脑看懂图片"},
+      {"pos": "CM", "name": "Transformer", "desc": "注意力机制，NLP基石"},
+      {"pos": "CM", "name": "NLP", "desc": "自然语言处理"},
+      {"pos": "RM", "name": "推荐系统", "desc": "抖音、淘宝的推荐算法"},
+      {"pos": "LW", "name": "自动驾驶", "desc": "感知+决策+控制"},
+      {"pos": "CF", "name": "大语言模型", "desc": "GPT、Claude等"},
+      {"pos": "RW", "name": "AI绘画", "desc": "Stable Diffusion等"}
+    ],
+    "bench": [
+      {"name": "GAN", "desc": "生成对抗网络"},
+      {"name": "扩散模型", "desc": "DALL-E、Midjourney原理"}
+    ]
+  }
+}

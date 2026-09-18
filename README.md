@@ -1,4 +1,4 @@
-# KnowPitch — 阵型学习法
+﻿# KnowPitch — 阵型学习法
 
 > **Put your knowledge on the pitch.**（把你的知识放上球场）
 
@@ -6,6 +6,23 @@
 内化了 ELI5 内核：假设零背景、不是零智商，用大白话+日常类比讲懂任何知识。
 
 > 对标项目：[DreambigOu/ELI5](https://github.com/DreambigOu/ELI5)（1.3k ⭐）
+
+---
+
+## 🎮 在线体验
+
+**[👉 Hugging Face Space Demo](https://huggingface.co/spaces/IYABAO/knowpitch-demo)** — 无需安装，直接体验阵型图生成
+
+---
+
+## 📦 已发布平台
+
+| 平台 | 链接 | 说明 |
+|------|------|------|
+| GitHub | [IYABAO/knowpitch](https://github.com/IYABAO/knowpitch) | 主仓库 |
+| skillhub.cn | 球知 | 中文名"球知" |
+| clawhub.ai | 已发布 | |
+| skills.sh | 已发布 | |
 
 ---
 
