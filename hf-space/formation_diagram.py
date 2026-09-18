@@ -223,16 +223,21 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
     # === 画足球场地 ===
     svg.extend(pitch_lines(box, clip_id))
 
-    # === 标题（最上方） ===
-    title = f"{esc(topic_label)}   {esc(formation)}"
+    # === 标题（最上方，分两行：主题 + 阵型） ===
+    title1 = topic_label
+    title2 = formation
     if team_label:
-        title = f"{esc(team_label)} | {title}"
-    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-60}" text-anchor="middle" '
-               f'font-size="48" font-weight="bold" fill="{TEXT_COLOR}">{title}</text>')
+        title1 = f"{team_label} | {title1}"
+    # 第一行：主题
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-90}" text-anchor="middle" '
+               f'font-size="40" font-weight="bold" fill="{TEXT_COLOR}">{esc(title1)}</text>')
+    # 第二行：阵型
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-50}" text-anchor="middle" '
+               f'font-size="28" font-weight="bold" fill="#666">{esc(title2)}</text>')
 
     # === 主教练（标题下方，左侧） ===
     if coach:
-        cx, cy = x0 + 20, y0 - 30
+        cx, cy = x0 + 20, y0 - 20
         svg.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="20" fill="{COACH_COLOR}"/>')
         svg.append(f'<text x="{cx:.0f}" y="{cy+4:.0f}" text-anchor="middle" '
                    f'font-size="12" font-weight="bold" fill="#fff">HC</text>')
