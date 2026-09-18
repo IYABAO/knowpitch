@@ -319,7 +319,7 @@ with gr.Blocks(title="KnowPitch 球知 - 用足球阵型学知识", theme=gr.the
 
         with gr.Column(scale=2):
             status = gr.Markdown("选择主题后点击生成")
-            svg_output = gr.Image(label="阵型图 Formation Diagram", type="filepath", width=1200)
+            svg_output = gr.Image(label="阵型图 Formation Diagram", type="filepath", width=1400)
 
             with gr.Tabs():
                 with gr.Tab("👥 球员卡 Player Cards"):
