@@ -197,14 +197,17 @@ def wrap_name(name, max_chars=14, max_lines=3):
 
 
 def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
-              team_label="", b_team=False, clip_id="pitch"):
+              team_label="", b_team=False, clip_id="pitch", flip=False):
     """在 box 内画一套阵容。"""
     x0, y0, x1, y1 = box
     w, h = x1 - x0, y1 - y0
-    r = 22  # 球员圈半径
+    r = 28  # 球员圈半径
 
     def pt(slot):
-        return (x0 + slot[1] / 100.0 * w, y0 + slot[2] / 100.0 * h)
+        px = slot[1]
+        if flip:
+            px = 100 - px  # 水平翻转：B队从右向左攻
+        return (x0 + px / 100.0 * w, y0 + slot[2] / 100.0 * h)
 
     slots = FORMATIONS.get(formation, [])
     if not slots:
@@ -225,7 +228,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
     if team_label:
         title = f"{esc(team_label)} | {title}"
     svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-55}" text-anchor="middle" '
-               f'font-size="22" font-weight="bold" fill="{TEXT_COLOR}">{title}</text>')
+               f'font-size="26" font-weight="bold" fill="{TEXT_COLOR}">{title}</text>')
 
     # === 主教练（标题下方，左侧） ===
     if coach:
@@ -279,11 +282,11 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
                        f'fill="#fff">{esc(gname)}</text>')
             # 球员名字（在圆圈下方）
             lines = wrap_name(p.get("name", ""), max_chars=14, max_lines=3)
-            ty = cy + r + 12
+            ty = cy + r + 14
             for ln in lines:
                 svg.append(f'<text x="{cx:.1f}" y="{ty:.1f}" text-anchor="middle" font-size="10" '
                            f'font-weight="bold" fill="{TEXT_COLOR}">{esc(ln)}</text>')
-                ty += 13
+                ty += 15
     # === 空位（可继续深挖） ===
     for i, (code, px, py) in enumerate(slots):
         if i in used_slots:
@@ -317,7 +320,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
             if bx > x1 - 30:
                 bx = x0 + 15
                 by += 48
-            svg.append(f'<circle cx="{bx}" cy="{by}" r="13" fill="{BENCH_COLOR}" '
+            svg.append(f'<circle cx="{bx}" cy="{by}" r="16" fill="{BENCH_COLOR}" '
                        f'stroke="#fff" stroke-width="2"/>')
             svg.append(f'<text x="{bx}" y="{by+3}" text-anchor="middle" font-size="7" '
                        f'fill="#fff">SUB</text>')
@@ -343,28 +346,28 @@ def main():
     b_team = team.get("b_team")
 
     # 计算画布高度（给替补席留空间）
-    base_height = 1020
+    base_height = 1100
     bench_extra = 120  # 替补席额外高度
 
     svg = []
-    svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="1020" height="{base_height + bench_extra}" '
-               f'viewBox="0 0 1020 {base_height + bench_extra}" '
+    svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="{base_height + bench_extra}" '
+               f'viewBox="0 0 1400 {base_height + bench_extra}" '
                f'font-family="\'PingFang SC\',\'Microsoft YaHei\','
                f'\'Noto Sans CJK SC\',sans-serif">')
-    svg.append(f'<rect width="1020" height="{base_height + bench_extra}" fill="#F4F7F2"/>')
+    svg.append(f'<rect width="1400" height="{base_height + bench_extra}" fill="#F4F7F2"/>')
 
     if b_team:
-        main_box = (28, 92, 488, 860)
-        b_box = (532, 92, 992, 860)
+        main_box = (40, 100, 660, 920)
+        b_box = (740, 100, 1360, 920)
         draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
                   team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
         bt = b_team.get("topic", topic + "·进阶")
         draw_team(svg, b_box, b_team.get("formation", "4-3-3"),
                   b_team.get("coach"), b_team.get("players", []),
                   b_team.get("bench", []), b_team.get("flow"), bt,
-                  team_label="B 队", b_team=True, clip_id="pitch_b")
+                  team_label="B 队", b_team=True, clip_id="pitch_b", flip=True)
     else:
-        main_box = (28, 92, 992, 860)
+        main_box = (40, 100, 1360, 920)
         draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
                   team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
 
