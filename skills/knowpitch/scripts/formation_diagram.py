@@ -229,7 +229,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
     if team_label:
         title1 = f"{team_label} | {title1}"
     # 第一行：主题
-    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-145}" text-anchor="middle" '
+    svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-210}" text-anchor="middle" '
                f'font-size="40" font-weight="bold" fill="{TEXT_COLOR}">{esc(title1)}</text>')
     # 第二行：阵型
     svg.append(f'<text x="{(x0+x1)/2:.0f}" y="{y0-145}" text-anchor="middle" '
@@ -242,7 +242,7 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
         svg.append(f'<text x="{cx:.0f}" y="{cy+4:.0f}" text-anchor="middle" '
                    f'font-size="12" font-weight="bold" fill="#fff">HC</text>')
         coach_text = f"主教练·{coach.get('name','')}"
-        svg.append(f'<text x="{cx+20:.0f}" y="{cy+4:.0f}" font-size="12" '
+        svg.append(f'<text x="{cx+50:.0f}" y="{cy+8:.0f}" font-size="24" '
                    f'font-weight="bold" fill="{TEXT_COLOR}">{esc(coach_text)}</text>')
 
     # === 学习路径箭头（球路） ===
@@ -362,8 +362,8 @@ def main():
     svg.append(f'<rect width="1600" height="{base_height + bench_extra}" fill="#F4F7F2"/>')
 
     if b_team:
-        main_box = (50, 260, 750, 1100)
-        b_box = (850, 260, 1550, 1100)
+        main_box = (50, 280, 750, 1100)
+        b_box = (850, 280, 1550, 1100)
         draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
                   team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
         bt = b_team.get("topic", topic + "·进阶")
@@ -372,7 +372,7 @@ def main():
                   b_team.get("bench", []), b_team.get("flow"), bt,
                   team_label="B 队", b_team=True, clip_id="pitch_b", flip=True)
     else:
-        main_box = (50, 260, 1550, 1100)
+        main_box = (50, 280, 1550, 1100)
         draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
                   team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
 
