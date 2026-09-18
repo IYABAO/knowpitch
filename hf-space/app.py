@@ -11,11 +11,7 @@ from pathlib import Path
 
 import gradio as gr
 
-try:
-    import cairosvg
-    HAS_CAIROSVG = True
-except ImportError:
-    HAS_CAIROSVG = False
+
 
 # ZeroGPU 兼容：添加空 GPU 函数满足检测（实际应用纯 CPU，不需要 GPU）
 try:
@@ -91,7 +87,7 @@ EXAMPLES = load_examples()
 
 
 def generate_diagram(team_data):
-    """生成阵型图，返回高分辨率 PNG 文件路径（SVG 转 2x PNG）"""
+    """生成阵型图 SVG，返回文件路径"""
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
     from formation_diagram import main as diagram_main
@@ -102,7 +98,6 @@ def generate_diagram(team_data):
         json_path = f.name
 
     svg_path = json_path.replace(".json", ".svg")
-    png_path = json_path.replace(".json", ".png")
 
     # 调用生成脚本
     old_argv = sys.argv
@@ -112,16 +107,7 @@ def generate_diagram(team_data):
     finally:
         sys.argv = old_argv
 
-    # 转换成 2x 高分辨率 PNG（文字更清晰）
-    if HAS_CAIROSVG:
-        try:
-            cairosvg.svg2png(url=svg_path, write_to=png_path, scale=2.0)
-            return png_path
-        except Exception as e:
-            print(f"⚠️ SVG转PNG失败，返回SVG: {e}")
-            return svg_path
-    else:
-        return svg_path
+    return svg_path
 
 
 def generate_custom_team(topic, formation="4-3-3"):
