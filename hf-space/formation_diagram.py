@@ -36,6 +36,7 @@ formation_diagram.py — 把"知识阵容"渲染成足球场 SVG 阵型图
 import json
 import sys
 import html
+import math
 
 FORMATIONS = {
     # 位置, x%, y% (虚拟球场坐标，左上角为原点，向右进攻)
@@ -150,16 +151,18 @@ def pitch_lines(box, clip_id):
     return L
 
 
-def wrap_name(name, max_chars=14, max_lines=3):
-    """把名字换行：英文按单词，中文按字符；超出 max_lines 用省略号。"""
+def wrap_name(name, max_chars=14):
+    """把名字完整换行（绝不丢字）：英文按单词，中文按字符。
+
+    返回全部行；超长的单个英文 token 整体保留为一行，
+    由 fit_font_size() 缩小字号保证不溢出、不截断。
+    """
     name = str(name).strip()
     if not name:
         return [""]
 
-    # 判断是否主要是英文（含空格）
-    has_space = ' ' in name
-    if has_space:
-        # 英文：按单词换行
+    if ' ' in name:
+        # 英文/混合：按单词换行
         words = name.split(' ')
         lines = []
         cur = ""
@@ -172,11 +175,12 @@ def wrap_name(name, max_chars=14, max_lines=3):
         if cur:
             lines.append(cur)
     else:
-        # 中文：按字符换行
+        # 无空格：中文按字符换行；超长英文 token 整体保留（交给缩字号）
         lines = []
         cur = ""
         for ch in name:
-            if len(cur) >= max_chars:
+            is_cjk = ord(ch) > 0x2E7F
+            if is_cjk and len(cur) >= max_chars:
                 lines.append(cur)
                 cur = ch
             else:
@@ -184,16 +188,22 @@ def wrap_name(name, max_chars=14, max_lines=3):
         if cur:
             lines.append(cur)
 
-    # 超过最大行数，最后一行加省略号
-    if len(lines) > max_lines:
-        lines = lines[:max_lines]
-        last = lines[-1]
-        if len(last) >= max_chars:
-            lines[-1] = last[:max_chars-1] + "…"
-        else:
-            lines[-1] = last + "…"
-
     return lines
+
+
+def fit_font_size(text, max_width, base_size, min_size=6):
+    """按内容估算文本宽度，返回不超过 max_width 的字号。
+
+    中文/全角约 1.0em，拉丁约 0.6em，预留 10% 余量。
+    长名字自动缩小但完整显示，绝不静默截断丢字。
+    """
+    units = 0.0
+    for ch in str(text):
+        units += 1.0 if ord(ch) > 0x2E7F else 0.6
+    size = float(base_size)
+    while size > min_size and units * size * 1.1 > max_width:
+        size -= 0.5
+    return round(size, 1)
 
 
 def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
@@ -285,13 +295,18 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
                        f'font-weight="bold" fill="#fff">{esc(code)}</text>')
             svg.append(f'<text x="{cx:.1f}" y="{cy+9:.1f}" text-anchor="middle" font-size="8" '
                        f'fill="#fff">{esc(gname)}</text>')
-            # 球员名字（在圆圈下方）
-            lines = wrap_name(p.get("name", ""), max_chars=14, max_lines=3)
-            ty = cy + r + 15
+            # 球员名字（在圆圈下方）：完整显示，长名自动缩字号，不截断
+            lines = wrap_name(p.get("name", ""), max_chars=14)
+            name_max_w = 2.9 * r  # 名字可用宽度
+            fs = min((fit_font_size(ln, name_max_w, 10, min_size=6) for ln in lines),
+                     default=10)
+            line_h = fs * 1.35
+            ty = cy + r + 12 + fs
             for ln in lines:
-                svg.append(f'<text x="{cx:.1f}" y="{ty:.1f}" text-anchor="middle" font-size="10" '
-                           f'font-weight="bold" fill="{TEXT_COLOR}">{esc(ln)}</text>')
-                ty += 32
+                svg.append(f'<text x="{cx:.1f}" y="{ty:.1f}" text-anchor="middle" '
+                           f'font-size="{fs}" font-weight="bold" fill="{TEXT_COLOR}">'
+                           f'{esc(ln)}</text>')
+                ty += line_h
     # === 空位（可继续深挖） ===
     for i, (code, px, py) in enumerate(slots):
         if i in used_slots:
@@ -318,24 +333,42 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
         # 替补席标题
         svg.append(f'<text x="{x0+5}" y="{by}" font-size="13" font-weight="bold" '
                    f'fill="{TEXT_COLOR}">替补席（{len(bench_all)}人）</text>')
-        # 替补内容（标题下方 20px 开始）
-        by += 36
+        # 替补内容（标题下方开始）：完整显示，长名缩字号，不截断
+        by += 40
         bx = x0 + 15
         for p in bench_all:
-            if bx > x1 - 30:
+            if bx > x1 - 40:
                 bx = x0 + 15
-                by += 60
+                by += 80
             svg.append(f'<circle cx="{bx}" cy="{by}" r="24" fill="{BENCH_COLOR}" '
                        f'stroke="#fff" stroke-width="2"/>')
             svg.append(f'<text x="{bx}" y="{by+3}" text-anchor="middle" font-size="7" '
                        f'fill="#fff">SUB</text>')
-            lines = wrap_name(p.get("name", ""), max_chars=24, max_lines=2)
-            ty = by + 50
+            lines = wrap_name(p.get("name", ""), max_chars=9)
+            bench_max_w = 66
+            fs = min((fit_font_size(ln, bench_max_w, 9, min_size=6) for ln in lines),
+                     default=9)
+            line_h = fs * 1.3
+            ty = by + 38 + fs
             for ln in lines:
-                svg.append(f'<text x="{bx}" y="{ty}" text-anchor="middle" font-size="9" '
-                           f'font-weight="bold" fill="{TEXT_COLOR}">{esc(ln)}</text>')
-                ty += 26
-            bx += 60
+                svg.append(f'<text x="{bx}" y="{ty:.1f}" text-anchor="middle" '
+                           f'font-size="{fs}" font-weight="bold" fill="{TEXT_COLOR}">'
+                           f'{esc(ln)}</text>')
+                ty += line_h
+            bx += 74
+
+
+def _bench_rows(team_data, formation, box_w):
+    """估算某一队替补席占用的行数（含位置代码不在阵型中的落单球员）。"""
+    players = team_data.get("players", [])
+    slot_codes = {s[0] for s in FORMATIONS.get(formation, [])}
+    leftovers = [p for p in players
+                 if POS_ALIAS.get(p.get("pos", ""), p.get("pos", "")) not in slot_codes]
+    n = len(leftovers) + len(team_data.get("bench", []))
+    if n == 0:
+        return 0
+    per_row = max(1, int((box_w - 55) / 74))
+    return math.ceil(n / per_row)
 
 
 def main():
@@ -350,16 +383,22 @@ def main():
     formation = team.get("formation", "4-3-3")
     b_team = team.get("b_team")
 
-    # 计算画布高度（给替补席留空间）
-    base_height = 1450
-    bench_extra = 120  # 替补席额外高度
+    # 画布高度随替补席行数自适应，保证多替补/长名字不被裁切
+    if b_team:
+        rows_a = _bench_rows(team, formation, 700)
+        rows_b = _bench_rows(b_team, b_team.get("formation", "4-3-3"), 700)
+        rows = max(rows_a, rows_b)
+    else:
+        rows = _bench_rows(team, formation, 1500)
+    # 球场底 1100，替补标题 +120，每行 80，底部留白
+    canvas_height = max(1570, 1300 + rows * 80 + 60)
 
     svg = []
-    svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="{base_height + bench_extra}" '
-               f'viewBox="0 0 1600 {base_height + bench_extra}" '
+    svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="{canvas_height}" '
+               f'viewBox="0 0 1600 {canvas_height}" '
                f'font-family="\'PingFang SC\',\'Microsoft YaHei\','
                f'\'Noto Sans CJK SC\',sans-serif">')
-    svg.append(f'<rect width="1600" height="{base_height + bench_extra}" fill="#F4F7F2"/>')
+    svg.append(f'<rect width="1600" height="{canvas_height}" fill="#F4F7F2"/>')
 
     if b_team:
         main_box = (50, 280, 750, 1100)
