@@ -1,0 +1,22 @@
+{
+  "topic": "长名字不截断测试",
+  "formation": "4-3-3",
+  "coach": {"name": "Medullary Thyroid Carcinoma Core", "desc": ""},
+  "players": [
+    {"pos": "GK", "name": "宋明理学与陆王心学之辨", "desc": "超长中文名必须完整显示"},
+    {"pos": "LB", "name": "左路背景", "desc": ""},
+    {"pos": "CB", "name": "Medullary Thyroid Carcinoma", "desc": "超长英文名必须完整显示"},
+    {"pos": "CB", "name": "BRAF V600E Mutation Pathway", "desc": "另一个超长英文名"},
+    {"pos": "RB", "name": "右路前置", "desc": ""},
+    {"pos": "CM", "name": "方法流程甲", "desc": ""},
+    {"pos": "CDM", "name": "底层机制", "desc": ""},
+    {"pos": "CM", "name": "方法流程乙", "desc": ""},
+    {"pos": "LW", "name": "Bethesda Classification Category", "desc": ""},
+    {"pos": "CF", "name": "核心结论", "desc": ""},
+    {"pos": "RW", "name": "应用案例乙", "desc": ""}
+  ],
+  "bench": [
+    {"name": "Radiofrequency Ablation Therapy Option", "desc": "替补席长名也不截断"}
+  ],
+  "flow": ["GK", "CB", "CDM", "CF"]
+}

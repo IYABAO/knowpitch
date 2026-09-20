@@ -1,0 +1,11 @@
+{
+  "topic": "非法阵型测试",
+  "formation": "9-9-9",
+  "coach": {"name": "核心思想", "desc": ""},
+  "players": [
+    {"pos": "GK", "name": "门将", "desc": ""},
+    {"pos": "CF", "name": "中锋", "desc": ""}
+  ],
+  "bench": [],
+  "flow": ["GK", "CF"]
+}

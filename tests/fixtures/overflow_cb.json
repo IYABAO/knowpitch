@@ -1,0 +1,21 @@
+{
+  "topic": "超额球员测试",
+  "formation": "4-3-3",
+  "coach": {"name": "一句话核心思想", "desc": ""},
+  "players": [
+    {"pos": "GK", "name": "门将基础", "desc": ""},
+    {"pos": "LB", "name": "左路背景", "desc": ""},
+    {"pos": "CB", "name": "中后卫甲", "desc": ""},
+    {"pos": "CB", "name": "中后卫乙", "desc": ""},
+    {"pos": "CB", "name": "中后卫丙超额", "desc": "4-3-3 只有 2 个 CB 槽，此人必须转入替补席"},
+    {"pos": "RB", "name": "右路前置", "desc": ""},
+    {"pos": "CM", "name": "方法流程甲", "desc": ""},
+    {"pos": "CDM", "name": "底层机制", "desc": ""},
+    {"pos": "CM", "name": "方法流程乙", "desc": ""},
+    {"pos": "LW", "name": "应用案例甲", "desc": ""},
+    {"pos": "CF", "name": "核心结论", "desc": ""},
+    {"pos": "RW", "name": "应用案例乙", "desc": ""}
+  ],
+  "bench": [],
+  "flow": ["GK", "CB", "CDM", "CF"]
+}

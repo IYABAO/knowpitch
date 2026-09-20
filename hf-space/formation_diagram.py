@@ -3,7 +3,12 @@
 formation_diagram.py — 把"知识阵容"渲染成足球场 SVG 阵型图
 
 用法:
-    python3 formation_diagram.py team.json output.svg
+    python3 formation_diagram.py team.json output.svg [--strict]
+
+退出码:
+    0  成功（SVG 已生成；stderr 可能仍有警告，交付前必须逐条处理）
+    2  参数错误 / 输入文件不存在 / JSON 解析失败 / 阵型不支持
+    3  --strict 模式下存在任何警告（SVG 仍会生成，便于排查）
 
 输入 JSON 结构:
 {
@@ -24,19 +29,25 @@ formation_diagram.py — 把"知识阵容"渲染成足球场 SVG 阵型图
 }
 
 - "players" 按场上位置代码摆放；同名位置（如两个 CB）按出现顺序填入。
-- 位置代码不在阵型中时，自动放上替补席并打印警告。
-- 场上位置未填满时，空位画成虚线"?"圈，代表"还可以继续深挖的位置"。
+- 同位置人数超过阵型槽位时（如 3 个 CB 塞进只有 2 个 CB 槽的阵型），多出的球员
+  不会消失：一律转入替补席，并在 stderr 给出明确警告（绝不静默丢内容）。
+- 位置代码不在阵型中时，同样放上替补席并在 stderr 警告。
+- 场上位置未填满时，空位画成虚线圈，代表"还可以继续深挖的位置"。
 - "flow" 可选：按位置代码顺序画学习路径箭头（球路）。
+  * 含阵型外的位置代码会在 stderr 逐条警告（该点被跳过），有效点不足 2 个时不画箭头并警告；
+  * 同名多槽位置（如两个 CB）默认连接第一个槽。
 - 知识点的 "desc" 只用于输出警告/统计，不画进 SVG（长文由 Agent 写进正文球员卡）。
 
 支持的阵型: 4-3-3, 4-2-3-1, 4-3-2-1, 4-4-2, 4-5-1, 4-1-4-1, 3-5-2, 3-4-3
 位置代码: GK RB CB LB CDM CM CAM AMD LAM RAM RM LM LW RW CF SS
 """
 
+import argparse
 import json
 import sys
 import html
 import math
+from collections import Counter
 
 FORMATIONS = {
     # 位置, x%, y% (虚拟球场坐标，左上角为原点，向右进攻)
@@ -208,7 +219,8 @@ def fit_font_size(text, max_width, base_size, min_size=6):
 
 def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
               team_label="", b_team=False, clip_id="pitch", flip=False):
-    """在 box 内画一套阵容。"""
+    """在 box 内画一套阵容。返回渲染过程中的警告列表（绝不静默丢内容）。"""
+    warnings = []
     x0, y0, x1, y1 = box
     w, h = x1 - x0, y1 - y0
     r = 50  # 球员圈半径
@@ -261,10 +273,20 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
         for s in slots:
             idx.setdefault(s[0], []).append(s)
         pts = []
+        unknown_flow = []
         for code in flow:
             k = POS_ALIAS.get(code, code)
             if k in idx and idx[k]:
                 pts.append(pt(idx[k][0]))
+            elif code not in unknown_flow:
+                unknown_flow.append(code)
+        if unknown_flow:
+            warnings.append(
+                f"球路包含阵型 {formation} 中不存在的位置："
+                f"{'、'.join(unknown_flow)}（已跳过，请检查 flow 与阵型是否匹配）")
+        if len(pts) < 2:
+            warnings.append(
+                f"球路有效节点不足 2 个，未画出学习路径箭头（flow={flow}，请对照阵型检查）")
         if len(pts) >= 2:
             marker_id = f"arrow_{clip_id}"
             svg.append(f'<defs><marker id="{marker_id}" viewBox="0 0 10 10" refX="26" refY="5" '
@@ -319,14 +341,23 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
         svg.append(f'<text x="{cx:.1f}" y="{cy+9:.1f}" text-anchor="middle" font-size="8" '
                    f'fill="#BDBDBD">空位</text>')
 
-    # === 替补席 ===
+    # === 替补席（位置不在阵型 / 同位置超额，一律收进来，绝不静默丢球员）===
+    slot_counts = Counter(POS_ALIAS.get(s[0], s[0]) for s in slots)
     leftovers = []
-    for p in players:
-        key = POS_ALIAS.get(p.get("pos", ""), p.get("pos", ""))
-        if key not in [s[0] for s in slots]:
-            leftovers.append(p)
-            print(f"警告: 位置 {p.get('pos')} 不在 {formation} 阵型中，"
-                  f"「{p.get('name')}」已放入替补席", file=sys.stderr)
+    for key, queue in pos_queue.items():
+        if not queue:
+            continue
+        names = "、".join(str(p.get("name", "")) for p in queue)
+        raw_pos = queue[0].get("pos", key)
+        if key in slot_counts:
+            warnings.append(
+                f"位置 {raw_pos} 在 {formation} 阵型中只有 {slot_counts[key]} 个槽，"
+                f"多出 {len(queue)} 人：{names}（已转入替补席；请更换阵型，"
+                f"或把多余球员放进 bench / 改打其他位置）")
+        else:
+            warnings.append(
+                f"位置 {raw_pos} 不存在于 {formation} 阵型：「{names}」已放入替补席")
+        leftovers.extend(queue)
     bench_all = leftovers + bench
     if bench_all:
         by = y1 + 120
@@ -357,27 +388,49 @@ def draw_team(svg, box, formation, coach, players, bench, flow, topic_label,
                 ty += line_h
             bx += 74
 
+    return warnings
+
 
 def _bench_rows(team_data, formation, box_w):
-    """估算某一队替补席占用的行数（含位置代码不在阵型中的落单球员）。"""
+    """估算某一队替补席占用的行数。
+
+    含两类落单球员：位置代码不在阵型中的、同位置超额（槽位用完仍多出）的，
+    与 draw_team() 实际收进替补席的口径保持一致，保证画布高度足够、不裁切。
+    """
     players = team_data.get("players", [])
-    slot_codes = {s[0] for s in FORMATIONS.get(formation, [])}
-    leftovers = [p for p in players
-                 if POS_ALIAS.get(p.get("pos", ""), p.get("pos", "")) not in slot_codes]
-    n = len(leftovers) + len(team_data.get("bench", []))
+    slot_counts = Counter(POS_ALIAS.get(s[0], s[0])
+                          for s in FORMATIONS.get(formation, []))
+    pos_count = Counter(POS_ALIAS.get(p.get("pos", ""), p.get("pos", ""))
+                        for p in players)
+    leftovers = 0
+    for key, cnt in pos_count.items():
+        leftovers += cnt - slot_counts[key] if key in slot_counts else cnt
+    n = leftovers + len(team_data.get("bench", []))
     if n == 0:
         return 0
     per_row = max(1, int((box_w - 55) / 74))
     return math.ceil(n / per_row)
 
 
-def main():
-    if len(sys.argv) != 3:
-        print(__doc__)
-        sys.exit(1)
-    in_path, out_path = sys.argv[1], sys.argv[2]
-    with open(in_path, "r", encoding="utf-8") as f:
-        team = json.load(f)
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="把知识阵容 JSON 渲染成足球场 SVG 阵型图")
+    parser.add_argument("input", help="输入阵容 JSON 路径")
+    parser.add_argument("output", help="输出 SVG 路径")
+    parser.add_argument("--strict", action="store_true",
+                        help="存在任何警告时以退出码 3 结束（交付前自检用）")
+    args = parser.parse_args(argv)
+
+    try:
+        with open(args.input, "r", encoding="utf-8") as f:
+            team = json.load(f)
+    except FileNotFoundError:
+        print(f"❌ 找不到输入文件：{args.input}", file=sys.stderr)
+        sys.exit(2)
+    except json.JSONDecodeError as e:
+        print(f"❌ 输入 JSON 解析失败（第 {e.lineno} 行第 {e.colno} 列）：{e.msg}",
+              file=sys.stderr)
+        sys.exit(2)
 
     topic = team.get("topic", "未命名主题")
     formation = team.get("formation", "4-3-3")
@@ -394,31 +447,51 @@ def main():
     canvas_height = max(1570, 1300 + rows * 80 + 60)
 
     svg = []
+    warnings_all = []
     svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="{canvas_height}" '
                f'viewBox="0 0 1600 {canvas_height}" '
                f'font-family="\'PingFang SC\',\'Microsoft YaHei\','
                f'\'Noto Sans CJK SC\',sans-serif">')
     svg.append(f'<rect width="1600" height="{canvas_height}" fill="#F4F7F2"/>')
 
-    if b_team:
-        main_box = (50, 280, 750, 1100)
-        b_box = (850, 280, 1550, 1100)
-        draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
-                  team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
-        bt = b_team.get("topic", topic + "·进阶")
-        draw_team(svg, b_box, b_team.get("formation", "4-3-3"),
-                  b_team.get("coach"), b_team.get("players", []),
-                  b_team.get("bench", []), b_team.get("flow"), bt,
-                  team_label="B 队", b_team=True, clip_id="pitch_b", flip=True)
-    else:
-        main_box = (50, 280, 1550, 1100)
-        draw_team(svg, main_box, formation, team.get("coach"), team.get("players", []),
-                  team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")
+    try:
+        if b_team:
+            main_box = (50, 280, 750, 1100)
+            b_box = (850, 280, 1550, 1100)
+            warnings_all += [f"[主队] {w}" for w in draw_team(
+                svg, main_box, formation, team.get("coach"), team.get("players", []),
+                team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")]
+            bt = b_team.get("topic", topic + "·进阶")
+            warnings_all += [f"[B队] {w}" for w in draw_team(
+                svg, b_box, b_team.get("formation", "4-3-3"),
+                b_team.get("coach"), b_team.get("players", []),
+                b_team.get("bench", []), b_team.get("flow"), bt,
+                team_label="B 队", b_team=True, clip_id="pitch_b", flip=True)]
+        else:
+            main_box = (50, 280, 1550, 1100)
+            warnings_all += [f"[主队] {w}" for w in draw_team(
+                svg, main_box, formation, team.get("coach"), team.get("players", []),
+                team.get("bench", []), team.get("flow"), topic, clip_id="pitch_main")]
+    except ValueError as e:
+        # 不支持的阵型等用户输入错误：给中文友好提示，不抛裸 Traceback
+        print(f"❌ {e}", file=sys.stderr)
+        sys.exit(2)
+    except Exception as e:  # noqa: BLE001 兜底：任何意外都不得静默或裸 Traceback
+        print(f"❌ 阵型图生成失败：{type(e).__name__}: {e}", file=sys.stderr)
+        sys.exit(2)
 
     svg.append('</svg>')
-    with open(out_path, "w", encoding="utf-8") as f:
+    with open(args.output, "w", encoding="utf-8") as f:
         f.write("\n".join(svg))
-    print(f"✅ 已生成阵型图: {out_path}")
+    print(f"✅ 已生成阵型图: {args.output}")
+
+    if warnings_all:
+        for w in warnings_all:
+            print(f"⚠️  {w}", file=sys.stderr)
+        if args.strict:
+            print("❌ --strict 模式下存在警告，以退出码 3 结束；请修正 JSON 后重新渲染",
+                  file=sys.stderr)
+            sys.exit(3)
 
 
 if __name__ == "__main__":

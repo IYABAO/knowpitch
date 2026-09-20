@@ -1,0 +1,22 @@
+{
+  "topic": "冒烟测试主题",
+  "formation": "4-3-3",
+  "coach": {"name": "一句话核心思想", "desc": "主教练的一句话"},
+  "players": [
+    {"pos": "GK", "name": "门将基础", "desc": "最底层地基"},
+    {"pos": "LB", "name": "左路背景", "desc": ""},
+    {"pos": "CB", "name": "核心概念甲", "desc": ""},
+    {"pos": "CB", "name": "核心概念乙", "desc": ""},
+    {"pos": "RB", "name": "右路前置", "desc": ""},
+    {"pos": "CM", "name": "方法流程甲", "desc": ""},
+    {"pos": "CDM", "name": "底层机制", "desc": ""},
+    {"pos": "CM", "name": "方法流程乙", "desc": ""},
+    {"pos": "LW", "name": "应用案例甲", "desc": ""},
+    {"pos": "CF", "name": "核心结论", "desc": ""},
+    {"pos": "RW", "name": "应用案例乙", "desc": ""}
+  ],
+  "bench": [
+    {"name": "进阶知识点", "desc": ""}
+  ],
+  "flow": ["GK", "CB", "CDM", "CM", "CF"]
+}

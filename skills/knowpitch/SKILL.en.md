@@ -9,11 +9,13 @@ description: >-
   non-knowledge topics (emotions/counseling), reports requiring precise data.
 allowed-tools: Bash(python3:*) Read Write Glob
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   category: learning
   compatibility: Requires Python 3.8+ for SVG generation.
   tags: [learning, education, visualization, eli5, football-formation]
 ---
+
+> **Translation status — read first.** This English file tracks the Chinese canonical skill up to **v1.3**. The Chinese `SKILL.md` is authoritative for **v1.4.0 and later**, including the fail-loud rendering contract, the `--strict` flag, exit codes (0 = ok, 2 = bad input, 3 = warnings under `--strict`), and the guarantee that overflow players move to the bench instead of disappearing. Whenever this file and `SKILL.md` differ, follow `SKILL.md` and `references/json-schema.md` (Chinese).
 
 # KnowPitch — Formation Learning Method
 

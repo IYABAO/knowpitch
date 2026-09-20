@@ -1,0 +1,25 @@
+{
+  "topic": "B队球路测试",
+  "formation": "4-3-3",
+  "coach": {"name": "主队核心", "desc": ""},
+  "players": [
+    {"pos": "GK", "name": "主队门将", "desc": ""},
+    {"pos": "CB", "name": "主队后卫", "desc": ""},
+    {"pos": "CDM", "name": "主队后腰", "desc": ""},
+    {"pos": "CF", "name": "主队中锋", "desc": ""}
+  ],
+  "bench": [],
+  "b_team": {
+    "topic": "B队扩展板块",
+    "formation": "3-4-3",
+    "coach": {"name": "B队次级核心", "desc": ""},
+    "players": [
+      {"pos": "GK", "name": "B队门将", "desc": ""},
+      {"pos": "CB", "name": "B队后卫", "desc": ""},
+      {"pos": "CM", "name": "B队中前卫", "desc": ""},
+      {"pos": "CF", "name": "B队中锋", "desc": ""}
+    ],
+    "bench": [],
+    "flow": ["GK", "CB", "CM", "CF"]
+  }
+}

@@ -7,16 +7,40 @@
 
 ## [Unreleased]
 
-### 修复
-- 🔧 **球员名/替补名彻底不再丢字**：重写换行逻辑，英文按单词、中文按字符完整折行；新增 `fit_font_size()` 按名字长度动态缩小字号，长名字（如 BRAF V600E、Bethesda VI、Medullary Thyroid Carcinoma）完整显示，不再硬截断或加省略号
-- 🔧 **替补席长名重叠**：替补名按可用宽度折行缩字号，横向间距与换行行距自适应；画布高度随替补席行数自动扩展，内容不再被裁切
-
 ### 计划中
-- [ ] 添加更多阵型（4-1-4-1、5-3-2）
+- [ ] v1.5：自测题（kps/--quiz，L1/L2/L3 三层）
+- [ ] 添加更多阵型（5-3-2）
 - [ ] 运行评估并发布结果
 - [ ] 支持多语言（日文）
 - [ ] HF Demo 自定义主题输入
 - [ ] 闪卡/复习卡生成
+- [ ] v2.0「The Season」：训练营、学习档案、间隔重复（单独立项）
+
+## [1.4.0] - 2026-09-19
+
+主题：**绝不静默（fail loud）+ 机械断言锁死 + 文档渐进式披露**。针对第三方评测暴露的"内容静默丢失/被改写"缺陷做健壮性加固，不含视觉布局变更。
+
+### 新增
+- 🛡️ **fail-loud 渲染契约**：同名位置超额、位置不在阵型、flow 含非法代码等"内容可能丢失"的情况，脚本一律在 stderr 明确告警（含位置、槽位、多出人数与球员名），不再静默处理
+- ✅ **`--strict` 模式与退出码**：`0` 成功；`2` 输入错误（文件缺失 / JSON 损坏 / 阵型不支持，均为中文报错、无裸 Traceback）；`3` strict 模式下存在任何告警（SVG 仍会写出便于排查）
+- ✅ **机械断言测试**：`tests/` 17 个标准库 unittest 用例（零依赖），覆盖 T1/T2/T5/T6/T8/N2/N4 缺陷与三个官方示例零警告回归
+- ✅ **GitHub Actions CI**：`.github/workflows/test.yml`，ubuntu + windows × Python 3.8/3.11/3.12 矩阵
+- ✅ `references/json-schema.md`：JSON 字段、位置代码、8 条渲染行为契约、退出码与 --strict 自检
+- ✅ `references/examples.md`：三个端到端完整示例迁出 SKILL.md 独立承载
+
+### 修复
+- 🔧 **同名位置超额不再蒸发球员（T1）**：如 4-3-3 只有 2 个 CB 槽却给了 3 个 CB，多出的球员转入替补席并告警，一个都不丢
+- 🔧 **CAM/AMD 别名争槽同样处理（N2）**：别名归一后超额球员转替补席并告警
+- 🔧 **flow 非法代码不再静默跳过（T6）**：阵型外代码逐条告警（报告原始写法），有效节点不足 2 个时不画箭头并再次告警
+- 🔧 **球员名/替补名彻底不再丢字（T2）**：重写换行逻辑，英文按单词、中文按字符完整折行；`fit_font_size()` 按名字长度动态缩字号，长名字（BRAF V600E、Bethesda Classification、Medullary Thyroid Carcinoma）完整显示，无硬截断、无省略号
+- 🔧 **替补席长名重叠/溢出画布（T8）**：替补名按可用宽度折行缩字号，画布高度随替补行数自适应
+- 🔧 **Windows 命令兼容（N1）**：文档统一命令回退链 `python3` → `python` → `py -3`，frontmatter allowed-tools 同步补充
+
+### 改进
+- 📄 SKILL.md 从 918 行精简到 497 行：JSON Schema 与完整示例迁入 references（渐进式披露），Step 7 重写为"读 stderr → 修 JSON 重跑 → --strict 自检"强制流程
+- 📄 删除异常表中"阵型图生成失败降级 ASCII 艺术"条款：禁止静默降级，修复前停止交付
+- 📄 Step 6 补充 flow 同名多槽默认连第一个槽的语义说明（N3）
+- 📄 SKILL.en.md 顶部新增翻译滞后声明：英文跟踪至 v1.3，v1.4+ 以中文 SKILL.md 为权威版
 
 ## [1.3.0] - 2026-09-18
 
@@ -125,5 +149,10 @@
 - eval-workflow.md（评估工作流文档）
 - eval-results.md（评估结果模板）
 
-[Unreleased]: https://github.com/IYABAO/knowpitch/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/IYABAO/knowpitch/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/IYABAO/knowpitch/releases/tag/v1.4.0
+[1.3.0]: https://github.com/IYABAO/knowpitch/releases/tag/v1.3.0
+[1.2.1]: https://github.com/IYABAO/knowpitch/releases/tag/v1.2.1
+[1.2.0]: https://github.com/IYABAO/knowpitch/releases/tag/v1.2.0
+[1.1.0]: https://github.com/IYABAO/knowpitch/releases/tag/v1.1.0
 [1.0.0]: https://github.com/IYABAO/knowpitch/releases/tag/v1.0.0
