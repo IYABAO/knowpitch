@@ -1,36 +1,15 @@
-﻿***
-
+---
 name: knowpitch
-
-description: >-
-
-用足球阵型把知识领域拆解成 "一支球队" 来深入学习与讲透。
-
-触发：kp11/kpt/kpitch/knowpitch + 主题；阵型学习、知识阵型图、
-
-4-3-3/CB/CDM/AMD 等位置代码 + 学习；"用足球阵型讲"、"排成球队"。
-
-产出：阵型图 SVG + 球员卡（ELI5 风格）+ 战术板（学习路径与连线）。
-
-Do NOT use for: 快速概念解释（用 ELI5）、思维导图、闪卡、
-
-非知识类主题（情感 / 咨询）、需要精确数据的报告。
-
-allowed-tools: Bash (python3:\*, python:\*, py:\*) Read Write Glob
-
-metadata:
-
+slug: knowpitch
+displayName: "KnowPitch 球知"
 version: "1.4.0"
-
+license: MIT
 category: learning
-
-compatibility: Requires Python 3.8+ for SVG generation.
-
-tags: \[learning, education, visualization, eli5, football-formation]
-
-
-
-***
+compatibility: "Requires Python 3.8+ for SVG generation."
+tags: [learning, education, visualization, eli5, football-formation]
+description: "用足球阵型把知识领域拆解成一支球队来深入学习与讲透。触发 kp11/kpt/kpitch/knowpitch 加主题；产出阵型图 SVG、ELI5 风格球员卡与教练战术板。Do NOT use for 快速概念解释（用 ELI5）、思维导图、闪卡、非知识类主题（情感/咨询）、需要精确数据的报告。"
+allowed-tools: "Bash (python3:*, python:*, py:*) Read Write Glob"
+---
 
 # KnowPitch — 阵型学习法
 
