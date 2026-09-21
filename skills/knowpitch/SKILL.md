@@ -2,12 +2,12 @@
 name: knowpitch
 slug: knowpitch
 displayName: "KnowPitch 球知"
-version: "1.4.0"
+version: "1.5.0"
 license: MIT
 category: learning
 compatibility: "Requires Python 3.8+ for SVG generation."
 tags: [learning, education, visualization, eli5, football-formation]
-description: "用足球阵型把知识领域拆解成一支球队来深入学习与讲透。触发 kp11/kpt/kpitch/knowpitch 加主题；产出阵型图 SVG、ELI5 风格球员卡与教练战术板。Do NOT use for 快速概念解释（用 ELI5）、思维导图、闪卡、非知识类主题（情感/咨询）、需要精确数据的报告。"
+description: "用足球阵型把知识领域拆解成一支球队来深入学习与讲透。触发 kp11/kpt/kpitch/knowpitch 加主题；kps 加主题=自测出题。产出阵型图 SVG、ELI5 风格球员卡与教练战术板；kps 模式出 10 道分层自测题（L1/L2/L3）+ 评分解题 + 阵型体检。Do NOT use for 快速概念解释（用 ELI5）、思维导图、闪卡、非知识类主题（情感/咨询）、需要精确数据的报告。"
 allowed-tools: "Bash (python3:*, python:*, py:*) Read Write Glob"
 ---
 
@@ -81,6 +81,8 @@ allowed-tools: "Bash (python3:*, python:*, py:*) Read Write Glob"
   * `kp11` / 默认模式：6-11 个知识点，标准阵容
 
   * `kpitch` / 完整模式：> 20 个知识点，启用 B 队
+
+  * `kps` / 自测模式：基于当前阵型出 10 道分层自测题（L1/L2/L3），考完成绩 + 阵型体检；无状态、不写盘（详见下方【quiz 分支】）
 
 * 如需外部事实，先检索 / 读资料，确保知识点有来源、不编造；拿不准的标 "待考证"。
 
@@ -213,6 +215,17 @@ allowed-tools: "Bash (python3:*, python:*, py:*) Read Write Glob"
 
 * 完成 10 项质量自查清单
 
+### Step 9: quiz 分支（kps 自测模式）
+
+当触发词是 `kps` 时，走本分支，**不渲染 SVG、不写盘**，纯对话出题。完整出题契约见 **`references/quiz.md`**，执行前必读。
+
+1. **先有阵型**：`kps 主题` 时先按 Step 2-4 排好阵容（可不出图、不交付 SVG）；`kps 自测` 时复用当前已排阵容。
+2. **固定 10 题、三层分布**：L1 基础层 3 题（门将+后卫，每题 5 分）、L2 机制层 4 题（中场，每题 10 分）、L3 应用层 3 题（前锋，每题 15 分），满分 100。题型混合（单选/判断/简答），一个球员最多 1 题。
+3. **先出题、藏答案**：先只出 10 道题干和答题区，让用户作答；答案和解析不提前给。
+4. **答完逐题讲评**：每题给答案 + 📍 回链位置（位置代码 + 球员名）+ ELI5 解析 + 一句话"为什么考它"。
+5. **评分 + 阵型体检**：给总分（按三层列小分），指出哪条线弱 = 哪个位置没踢明白，给下一步学习建议，最后用主教练口吻一句话点评。
+6. **红线**：无状态不写盘；每题都能回链到当前阵型的某个位置；不出纯背诵题；解析必须 ELI5；不重新渲染 SVG。
+
 ## 异常处理
 
 
@@ -234,7 +247,7 @@ allowed-tools: "Bash (python3:*, python:*, py:*) Read Write Glob"
 
 | 参数      | 类型     | 必填 | 说明                                     |
 | ------- | ------ | -- | -------------------------------------- |
-| 触发词     | string | 是  | kp11/kpt/kpitch/knowpitch              |
+| 触发词     | string | 是  | kp11/kpt/kpitch/knowpitch/kps（kps=自测出题） |
 | 主题      | string | 是  | 要学习的知识领域 / 概念                          |
 | 深度      | enum   | 否  | quick/standard/deep，默认由触发词决定           |
 | 阵型      | string | 否  | 强制指定阵型（4-3-3/4-2-3-1 等）                |
@@ -278,6 +291,10 @@ allowed-tools: "Bash (python3:*, python:*, py:*) Read Write Glob"
 * `kp11 代码库结构 --job manager`（给经理解释，商务化）
 
 * `kp11 Git 合并冲突 --grade 5th`（5 年级学生能懂）
+
+* `kps 机器学习`（先排阵型再出 10 道自测题）
+
+* `kps 自测`（基于刚排好的当前阵容出题，不重排）
 
 ## 输出契约
 

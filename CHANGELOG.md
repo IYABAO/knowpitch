@@ -8,13 +8,29 @@
 ## [Unreleased]
 
 ### 计划中
-- [ ] v1.5：自测题（kps/--quiz，L1/L2/L3 三层）
 - [ ] 添加更多阵型（5-3-2）
 - [ ] 运行评估并发布结果
 - [ ] 支持多语言（日文）
 - [ ] HF Demo 自定义主题输入
 - [ ] 闪卡/复习卡生成
 - [ ] v2.0「The Season」：训练营、学习档案、间隔重复（单独立项）
+
+## [1.5.0] - 2026-09-20
+
+主题：**自测题（kps / quiz）**。在不改动阵型渲染与 v1.4 健壮性的前提下，新增显式触发的出题模式，把"学完一支球队"变成"考一支球队"。
+
+### 新增
+- 🧠 **新触发词 `kps`（自测模式）**：`kps 主题` 先排阵容再出 10 道自测题；`kps 自测` 基于当前阵容出题，不重排
+- 📐 **固定 10 题、三层分层**：L1 基础层 3 题（门将+后卫，每题 5 分）/ L2 机制层 4 题（中场，每题 10 分）/ L3 应用层 3 题（前锋，每题 15 分），满分 100；题型混合（单选/判断/简答）
+- 🎯 **答案 + ELI5 解析 + 回链位置**：先出题藏答案，用户答完逐题讲评，每题回链阵型位置（📍 位置代码 + 球员名）
+- 🩺 **评分与阵型体检**：总分按三层列小分，指出哪条线弱 = 哪个位置没踢明白，给下一步学习建议 + 主教练口吻一句话点评
+- 📄 `references/quiz.md`：出题契约（触发定位、10 题分布、每题结构、评分体检、6 条红线）
+- 📄 SKILL.md 新增 Step 9（quiz 分支）、Step 1 深度模式与输入契约加入 `kps`、frontmatter description 补充自测触发词
+
+### 约束
+- 无状态、不写盘：纯对话出题，不生成文件、不存进度
+- 不改阵型图：kps 模式只出题讲评，不重新渲染 SVG
+- 每题可回链到当前阵型的某个位置；不出纯背诵题；解析与正常阵型学习同一把 ELI5 尺子
 
 ## [1.4.0] - 2026-09-19
 
@@ -149,7 +165,8 @@
 - eval-workflow.md（评估工作流文档）
 - eval-results.md（评估结果模板）
 
-[Unreleased]: https://github.com/IYABAO/knowpitch/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/IYABAO/knowpitch/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/IYABAO/knowpitch/releases/tag/v1.5.0
 [1.4.0]: https://github.com/IYABAO/knowpitch/releases/tag/v1.4.0
 [1.3.0]: https://github.com/IYABAO/knowpitch/releases/tag/v1.3.0
 [1.2.1]: https://github.com/IYABAO/knowpitch/releases/tag/v1.2.1
