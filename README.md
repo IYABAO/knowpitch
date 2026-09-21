@@ -1,4 +1,4 @@
-﻿# KnowPitch — 阵型学习法
+# KnowPitch — 阵型学习法
 
 > **Put your knowledge on the pitch.**（把你的知识放上球场）
 
@@ -295,9 +295,14 @@ PRs welcome！改进方向：
 - [x] v1.0.0：基础阵型学习法 + SVG 生成
 - [x] v1.1.0：质量优化（NEVER 清单、输入输出契约、完整示例）
 - [x] v1.2.0：受众适配参数（--age/--job/--grade）
-- [ ] v1.3.0：英文支持
-- [ ] v1.4.0：评估系统接入 LLM API，发布真实效果数据
-- [ ] v1.5.0：发布到 Skill 市场
+- [x] v1.2.1：英文版 SKILL.en.md
+- [x] v1.3.0：HF Space Demo + 多平台发布（skillhub / clawhub / skills.sh）
+- [x] v1.4.0：fail-loud 渲染契约（绝不静默丢球员）+ 17 单测 + CI
+- [x] v1.5.0：kps 自测题（10 题三层 L1/L2/L3 + 评分配阵型体检）
+- [ ] v1.6.0：收尾（英文版同步 v1.5、市场重发布）+ HF Demo 自定义主题输入
+- [ ] v1.7.0：闪卡/复习卡（学→考→练闭环）+ 5-3-2 阵型
+- [ ] v1.8.0+：接入 LLM 评估发真实数据、多语言（日文）
+- [ ] v2.0「The Season」：训练营、学习档案、间隔重复（单独立项）
 
 ---
 

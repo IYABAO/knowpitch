@@ -1,21 +1,27 @@
 ---
 name: knowpitch
+slug: knowpitch
+displayName: "KnowPitch 球知"
+version: "1.5.0"
 description: >-
   Break down any knowledge domain into a "football team" for deep learning and mastery.
-  Triggers: kp11/kpt/kpitch/knowpitch + topic; formation learning, knowledge formation diagram,
+  Triggers: kp11/kpt/kpitch/knowpitch + topic; kps = quiz/self-test on the formed team;
+  formation learning, knowledge formation diagram,
   position codes like 4-3-3/CB/CDM/AMD + learning; "explain with football formation", "arrange as a team".
   Output: formation diagram SVG + player cards (ELI5 style) + tactics board (learning path and connections).
   Do NOT use for: quick concept explanation (use ELI5), mind maps, flashcards,
   non-knowledge topics (emotions/counseling), reports requiring precise data.
 allowed-tools: Bash(python3:*) Read Write Glob
 metadata:
-  version: "1.3.0"
+  version: "1.5.0"
   category: learning
   compatibility: Requires Python 3.8+ for SVG generation.
   tags: [learning, education, visualization, eli5, football-formation]
 ---
 
-> **Translation status — read first.** This English file tracks the Chinese canonical skill up to **v1.3**. The Chinese `SKILL.md` is authoritative for **v1.4.0 and later**, including the fail-loud rendering contract, the `--strict` flag, exit codes (0 = ok, 2 = bad input, 3 = warnings under `--strict`), and the guarantee that overflow players move to the bench instead of disappearing. Whenever this file and `SKILL.md` differ, follow `SKILL.md` and `references/json-schema.md` (Chinese).
+> **Translation status — read first.** This English file tracks the Chinese canonical skill through **v1.5.0**. The Chinese `SKILL.md` remains authoritative for any future change.
+> **v1.4.0 (fail-loud):** overflow players move to the bench instead of disappearing; the renderer warns on stderr (extra players, off-formation positions, invalid flow codes); use `--strict` (exit 3 if any warning); exit codes: 0 = ok, 2 = bad input, 3 = warnings under `--strict`. See `references/json-schema.md`.
+> **v1.5.0 (kps quiz):** trigger `kps` runs a 10-question self-test on the formed team (L1/L2/L3 layered scoring), pure conversation, no SVG, no state.
 
 # KnowPitch — Formation Learning Method
 
@@ -63,6 +69,7 @@ Execute in order:
   - `kpt` / Quick mode: ≤ 5 knowledge points, compact formation
   - `kp11` / Default mode: 6-11 knowledge points, standard formation
   - `kpitch` / Full mode: > 20 knowledge points, enable B team
+  - `kps` / Quiz mode: self-test on the formed team (go to Step 9; no SVG, no state)
 - If external facts needed, research/read first to ensure knowledge points have sources and are not fabricated; mark uncertain ones as "to be verified".
 
 ### Step 2: Inventory Knowledge Points and Function Classification
@@ -123,15 +130,28 @@ Knowledge structure shape?
 - Key connections (who is strongly related to whom)
 - "Three ways to lose" (most easily misunderstood/wrong points)
 
-### Step 7: Render Formation Diagram
-- Write formation as JSON (structure see [Formation Diagram JSON Schema] below)
-- Run `python3 scripts/formation_diagram.py team.json output.svg`
-- Verify output SVG exists and is non-empty
+### Step 7: Render Formation Diagram (fail loud, never ignore warnings)
+1. Write the formation as JSON (fields and render contract in `references/json-schema.md`, read before rendering).
+2. Run the renderer (use the first available of `python3` → `python` → `py -3`):
+   `python3 scripts/formation_diagram.py team.json output.svg`
+3. **Must read stderr**: the renderer only warns (exit 0) on "content possibly lost" cases — extra players at a position, positions not in the formation, invalid flow codes; overflow players move to the bench. Check each warning; if unexpected, fix the JSON (change formation / move extra players into `bench` / fix flow), do not ship with surprises.
+4. Re-run with `--strict` before delivery: `python3 scripts/formation_diagram.py team.json output.svg --strict`; exit code must be 0 (exit 3 = any warning present).
+5. Verify the SVG exists, is non-empty, and all players (including bench) names are complete, not truncated.
+6. Exit code 2 (missing file / bad JSON / unsupported formation) → fix input per the Chinese error message and re-run; **do NOT substitute an ASCII formation diagram as degraded delivery**.
 
 ### Step 8: Deliver and Quality Self-Check
 - Organize content following [Output Template]
 - Deliver formation diagram using present_files
 - Complete 10-item quality self-check list
+
+### Step 9: Quiz branch (kps self-test mode)
+When the trigger is `kps`, take this branch: **no SVG, no disk writes**, pure conversation. Full quiz contract in **`references/quiz.md`**, read before executing.
+1. **Have a formation first**: `kps topic` first form the team (Steps 2-4, no need to draw/deliver SVG); `kps quiz` reuses the current team.
+2. **Fixed 10 questions, layered**: L1 foundation 3 questions (GK+defenders, 5 pts each) / L2 mechanism 4 questions (midfield, 10 pts each) / L3 application 3 questions (forwards, 15 pts each); total 100. Mixed question types (single choice / true-false / short answer); at most 1 question per player.
+3. **Questions first, answers hidden**: output the 10 stems and answer area only; do not reveal answers.
+4. **Grade one by one after answering**: each item gives answer + 📍 back-link to the position (position code + player name) + ELI5 explanation + one line "why this is tested".
+5. **Score + formation health check**: total by layer; point out which line is weak = which position is not understood; give next-step learning advice; end with the head coach's one-line verdict.
+6. **Red lines**: stateless, no disk; every question back-links to a position in the current formation; no pure rote questions; explanations use the same ELI5 standard; do not re-render the SVG.
 
 ## Exception Handling
 
@@ -139,7 +159,8 @@ Knowledge structure shape?
 |-----------|----------|
 | Knowledge points < 3 | Prompt user topic is too narrow, suggest expansion; only arrange "head coach + goalkeeper + 1 defender" |
 | Knowledge points > 50 | Auto-split into multiple sub-topics, each arranged separately |
-| Formation diagram generation fails | Fall back to plain-text formation diagram (ASCII art), prompt user to check Python environment |
+| Formation diagram generation fails (exit 2) | Read the stderr error (bad JSON / unsupported formation / missing file), fix input and re-run; check Python 3.8+. **Do NOT fall back to ASCII art**; stop delivery until fixed |
+| Exit 0 but stderr has ⚠️ warnings | Check each: overflow players moved to bench, invalid flow codes skipped; unexpected warnings must be fixed in JSON and re-run; under `--strict` any warning = exit 3 |
 | Can't find head coach | Honestly state "this topic has no single core idea", let goalkeeper take leadership role |
 | User unsatisfied with formation | Offer 2-3 alternative formations, explain expression differences of each |
 
@@ -149,7 +170,7 @@ User input format: `[trigger] [topic] [optional parameters]`
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| trigger | string | yes | kp11/kpt/kpitch/knowpitch |
+| trigger | string | yes | kp11/kpt/kpitch/knowpitch/kps |
 | topic | string | yes | Knowledge domain/concept to learn |
 | depth | enum | no | quick/standard/deep, default determined by trigger |
 | formation | string | no | Force specific formation (4-3-3/4-2-3-1 etc.) |
@@ -171,10 +192,12 @@ User input format: `[trigger] [topic] [optional parameters]`
 - `kp11 explain machine learning` (default mode, 4-3-3)
 - `kpt what is inflation` (quick mode, compact)
 - `kpitch deep dive on React Hooks` (full mode, B team)
-- `kp11 neural networks --formation 4-2-3-1` (指定阵型)
+- `kp11 neural networks --formation 4-2-3-1` (force formation)
 - `kp11 database indexing --age 5` (explain to a 5-year-old)
 - `kp11 codebase structure --job manager` (explain to manager, business-oriented)
 - `kp11 Git merge conflicts --grade 5th` (explain to 5th grader)
+- `kps explain machine learning` (form the team, then run a 10-question self-test)
+- `kps quiz` (reuse the current team, run the self-test directly)
 
 ## Output Contract
 
@@ -524,7 +547,9 @@ Each starting player card uniformly has 4 lines (default 1-3 sentences; when use
 - [ ] When knowledge points > 20, B team enabled; when ≤ 20, didn't force-fill 11 players
 - [ ] Knowledge points from user input or verified sources, not fabricated; uncertain marked "to be verified"
 - [ ] Formation diagram generated and delivered, body structure matches output template
+- [ ] Renderer stderr has no unexpected warnings, `--strict` exit code is 0; all players (incl. bench) names are complete and not truncated
 - [ ] When user asks for deep, key player cards have enough detail not just one sentence
 - [ ] Tactics board includes "three ways to lose" (common misunderstandings/errors)
 - [ ] No violation of any item in NEVER list
 - [ ] Audience parameters (--age/--job/--grade) correctly applied to language difficulty and analogy direction
+- [ ] When trigger is kps: 10 layered questions, answers hidden first, graded with back-links and formation health check; no SVG, no state
