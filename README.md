@@ -317,3 +317,10 @@ PRs welcome！改进方向：
 ## 📄 License
 
 MIT
+
+---
+
+## 关于作者
+
+林壮（[IYABAO](https://github.com/IYABAO)），10 年以上后端经验，关注 Go 后端架构与 AI 工程化。
+技术博客：[www.plbear.com](https://www.plbear.com/) （后端架构 / AI 工程 / 云原生，实战踩坑与压测数据）
