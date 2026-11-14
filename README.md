@@ -112,6 +112,19 @@ cp -r knowpitch/skills/knowpitch ~/.your-agent/skills/knowpitch
 skillhub install knowpitch
 ```
 
+### 方式 3：命令行生成 SVG（开发者/老师）
+
+```bash
+git clone https://github.com/IYABAO/knowpitch.git
+cd knowpitch
+pip install -e .
+knowpitch svg examples/machine_learning.json out.svg
+```
+
+- `examples/` 提供 3 个可直接运行的示例：`machine_learning.json`、`inflation.json`、`react_hooks.json`。
+- 输出为 UTF-8 SVG，不需要 LLM key；加 `--strict` 时，任何阵容警告都会让命令以退出码 3 结束。
+- 兼容原有调用：`python skills/knowpitch/scripts/formation_diagram.py team.json out.svg`。
+
 ### 前置要求
 
 - Python 3.8+（用于生成阵型图 SVG）

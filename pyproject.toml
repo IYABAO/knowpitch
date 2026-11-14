@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "knowpitch"
+version = "1.6.0"
+description = "用足球阵型把知识讲成一支球队，并生成 SVG 阵型学习图"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [{name = "IYABAO"}]
+keywords = ["knowledge", "education", "svg", "skill", "formation"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/IYABAO/knowpitch"
+Demo = "https://huggingface.co/spaces/IYABAO/knowpitch-demo"
+
+[project.scripts]
+knowpitch = "knowpitch_cli:main"
+
+[tool.setuptools]
+py-modules = ["knowpitch_cli"]
+
+[tool.setuptools.data-files]
+"share/knowpitch/skills" = ["skills/knowpitch/scripts/formation_diagram.py"]
